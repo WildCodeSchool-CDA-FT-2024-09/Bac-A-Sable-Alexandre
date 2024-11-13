@@ -23,7 +23,7 @@ services:
     build: ./creation_api
     ports:
       - 4000:4000
-    command: npm run seed
+    command: sh -c "npm run seed && npm run dev"
     restart: always
     env_file: .env
     volumes:

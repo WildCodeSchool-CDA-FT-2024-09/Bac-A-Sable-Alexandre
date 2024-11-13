@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: my_database
+      POSTGRES_HOST: db
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5433:5432" # Expose pour déboguer si nécessaire
+
+  api:
+    build: ./creation_api
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      npm run seed && npm test  # Remplace par les commandes adaptées pour tes tests
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: my_database
+      POSTGRES_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
